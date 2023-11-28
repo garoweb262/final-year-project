@@ -8,6 +8,7 @@ const {
   randomCode,
   generatePayment,
   rentGeneratePayment,
+  
 } = require("../config/constants");
 const fs = require("fs");
 const path = require("path");

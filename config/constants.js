@@ -22,7 +22,7 @@ module.exports = constant = {
   randomPin: (length = 15) => {
     return Math.floor(
       Math.pow(10, length - 1) +
-        Math.random() * (Math.pow(10, length) - Math.pow(10, length - 1) - 1)
+      Math.random() * (Math.pow(10, length) - Math.pow(10, length - 1) - 1)
     );
   },
   randomCode(len = 6, bits = 16) {
@@ -140,9 +140,9 @@ module.exports = constant = {
     return true;
   },
   generatePayment: async (data) => {
-    console.log(JSON.stringify(data))
+    // console.log(JSON.stringify(data))
     const resp = await axios.post(
-      "https://api.flutterwave.com/v3/payments",
+      `${process.env.FLUTTERWAVE_URL}payments`,
       {
         tx_ref: data.tx_ref,
         amount: data.amount,
@@ -205,5 +205,20 @@ module.exports = constant = {
 
     // console.log(resp);
     return resp;
+  },
+ verifyPayment: async (reference) => {
+    try {
+      console.log(JSON.stringify(reference));
+      const resp = await axios.get(`${process.env.FLUTTERWAVE_URL}transactions/verify_by_reference?tx_ref=${reference}`, {
+        headers: {
+          authorization: `Bearer ${process.env.FLUTTERWAVE_SECRET_KEY}`,
+          // "Content-Type": "application/json",
+        },
+      });
+      return resp.data; // Return the response data
+    } catch (error) {
+      console.error('Error in verifying payment:', error);
+      throw error; // Throw the error for handling it where this function is called
+    }
   },
 };

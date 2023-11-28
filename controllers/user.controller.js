@@ -10,6 +10,7 @@ const {
   randomCode,
   currentDate,
   sendEMail,
+  verifyPayment,
 } = require("../config/constants");
 //handle errors
 const handleErrors = (err) => {
@@ -161,31 +162,96 @@ module.exports.get_purchase = async (req, res) => {
   });
 };
 module.exports.get_verify = async (req, res) => {
-  Purchase.find().then((data, err) => {
-    if (err) {
-      console.log(err);
-    } else {
-      res.render("../views/pages/guest/verify", {
-        title: "Payment Status",
-        layout: "./layouts/admin",
-        data,
-      });
+  try {
+    const purchases = await Purchase.find().exec();
+    if (!purchases || purchases.length === 0) {
+      return res.status(400).json({ success: false, message: 'No purchases found' });
     }
-  });
+
+    const latestPurchase = purchases[purchases.length - 1];
+    const reference = latestPurchase?.reference;
+
+    if (!reference) {
+      return res.status(400).json({ success: false, message: 'Reference not found in data' });
+    }
+
+    const verify = await verifyPayment(reference);
+
+    if (!verify || verify.status !== "success") {
+      return res.status(400).json({ success: false, message: 'Failed to verify payment' });
+    }
+
+    // Update purchase status based on verification result
+    const updatedPurchase = await Purchase.findByIdAndUpdate(
+      latestPurchase._id,
+      { status: "success" },
+      { new: true } // To get the updated document after update
+    );
+
+    if (!updatedPurchase) {
+      return res.status(400).json({ success: false, message: 'Failed to update purchase status' });
+    }
+
+    console.log('Purchase status updated successfully:', updatedPurchase);
+    res.render('../views/pages/guest/verify', {
+      title: 'Payment Status',
+      layout: './layouts/admin',
+      data: updatedPurchase,
+    });
+  } catch (error) {
+    console.error('Error in get_verify:', error);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
 };
+
+
 module.exports.get_rent_verify = async (req, res) => {
-  Purchase.find().then((data, err) => {
-    if (err) {
-      console.log(err);
-    } else {
-      res.render("../views/pages/guest/rent-verify", {
-        title: "Payment Status",
-        layout: "./layouts/admin",
-        data,
-      });
+  try {
+    const rent = await Rental.find().exec();
+    if (!rent || rent.length === 0) {
+      return res.status(400).json({ success: false, message: 'No rentals found' });
     }
-  });
+
+    const latestRental = rent[rent.length - 1];
+    const reference = latestRental?.reference;
+
+    console.log(JSON.stringify(latestRental));
+
+    if (!reference) {
+      return res.status(400).json({ success: false, message: 'Reference not found in rental data' });
+    }
+
+    const verify = await verifyPayment(reference);
+
+    if (!verify || verify.data.success !== "success") {
+      return res.status(400).json({ success: false, message: 'Failed to verify payment' });
+    }
+
+    // Update rental status based on verification result
+    const updatedRental = await Rental.findByIdAndUpdate(
+      latestRental._id, // Assuming _id is the identifier for the rental
+      { status: verify.status },
+      { new: true } // To get the updated document after update
+    );
+
+    if (!updatedRental) {
+      return res.status(400).json({ success: false, message: 'Failed to update rental status' });
+    }
+
+    console.log('Rental status updated successfully:', updatedRental);
+    res.render("../views/pages/guest/rent-verify", {
+      title: "Payment Status",
+      layout: "./layouts/admin",
+      data: updatedRental,
+    });
+  } catch (error) {
+    console.error('Error in get_rent_verify:', error);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
 };
+
+
+
 module.exports.openPdf = async (req, res) => {
   let id = req.params.id;
   Book.findById(id).exec((err, result) => {
