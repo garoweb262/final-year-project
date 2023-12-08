@@ -17,7 +17,7 @@
           <table id="add-row" class="display table table-striped table-hover">
             <thead>
               <tr>
-                <!-- <th>Sn</th> -->
+                <th>Sn</th>
                 <th>Title</th>
                 <th>Catalogue</th>
                 <th>Author</th>
@@ -29,8 +29,8 @@
 
             <tbody>
               <% result.forEach((pur, index) => {%>
-              <tr>
-                <!-- <td><%=++index %></td> -->
+                <tr key=<%= index %>>
+                <td><%=++index %></td>
                 <td><%=pur.bookId.title %></td>
                 <td><%=pur.bookId.catalogue %></td>
                 <td><%=pur.bookId.author %></td>
@@ -51,8 +51,15 @@
 </div>
 <script>
   $(document).ready(function () {
-    $("table").DataTable({
-      order: [0, "desc"],
+    $('#add-row').DataTable({
+      order: [0, 'asc'],
+      columnDefs: [
+        {
+          targets: [0, 1, 2, 3,4,5],
+          searchable: true,
+          orderable: true,
+        },
+      ],
     });
   });
 </script>

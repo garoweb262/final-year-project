@@ -27,6 +27,7 @@
               <table id="add-row" class="display table table-striped table-hover">
                 <thead>
                   <tr>
+                    <th>Sn</th>
                     <th>Payment Reference</th>
                     <th>Payment Amount</th>
                     <th>Payment Status</th>
@@ -40,7 +41,8 @@
                 </thead>
                 <tbody>
                   <% result.forEach((payment, index) => { %>
-                    <tr>
+                    <tr key=<%= index %>>
+                        <td><%=++index%></td>
                       <td><%= payment.reference %></td>
                       <td><%= payment.price %></td>
                       <td><%= payment.status %></td>
@@ -66,20 +68,16 @@
   <script>
     $(document).ready(function () {
       $('#add-row').DataTable({
-        order: [0, 'desc'],
+        order: [0, 'asc'],
         columnDefs: [
           {
-            targets: [0, 1, 2, 3,4,5,6,7], // Column indexes for reference, status, title (0-based index)
+            targets: [0, 1, 2, 3,4,5,6,7], 
             searchable: true,
             orderable: true,
           },
         ],
       });
     });
-    function formatDate(date) {
-  const options = { day: 'numeric', month: 'short', year: 'numeric' };
-  return new Intl.DateTimeFormat('en-US', options).format(new Date(date));
-}
   </script>
   
   

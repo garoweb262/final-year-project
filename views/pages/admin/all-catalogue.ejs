@@ -37,7 +37,7 @@
           <table id="add-row" class="display table table-striped table-hover">
             <thead>
               <tr>
-                <!-- <th>Sn</th> -->
+                <th>Sn</th>
                 <th>Catalogue Name</th>
                 <th>Catalogue Description</th>
 
@@ -47,9 +47,8 @@
 
             <tbody>
               <% result.forEach((cat, index) => { %>
-              <!-- <tr key=<%= index %>>
+              <tr key=<%= index %>>
                 <td><%= ++index %></td>
-               -->
                 <td><%=cat.name%></td>
                 <td><%=cat.description%></td>
 
@@ -69,7 +68,7 @@
                     </button>
                   </div>
                 </td>
-              </trkey>
+              </tr>
               <%})%>
             </tbody>
           </table>
@@ -83,8 +82,15 @@
 </div>
 <script>
   $(document).ready(function () {
-    $("table").DataTable({
-      order: [0, "desc"],
+    $('#add-row').DataTable({
+      order: [0, 'asc'],
+      columnDefs: [
+        {
+          targets: [0, 1, 2, 3], // Column indexes for reference, status, title (0-based index)
+          searchable: true,
+          orderable: true,
+        },
+      ],
     });
   });
 </script>

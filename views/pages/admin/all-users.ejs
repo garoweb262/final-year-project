@@ -29,7 +29,7 @@
           <table id="add-row" class="display table table-striped table-hover">
             <thead>
               <tr>
-                <!-- <th>Sn</th> -->
+                <th>Sn</th>
                 <th>Name</th>
                 <th>Email</th>
                 <th>Phone</th>
@@ -39,8 +39,8 @@
 
             <tbody>
               <% data.forEach((user, index) => {%>
-              <tr>
-                <!-- <td><%=++index%></td> -->
+                <tr key=<%= index %>>
+                <td><%=++index%></td>
                 <td><%=user.name%></td>
                 <td><%=user.email%></td>
                 <td><%=user.phone%></td>
@@ -73,8 +73,15 @@
 </div>
 <script>
   $(document).ready(function () {
-    $("table").DataTable({
-      order: [0, "desc"],
+    $('#add-row').DataTable({
+      order: [0, 'asc'],
+      columnDefs: [
+        {
+          targets: [0, 1, 2, 3], 
+          searchable: true,
+          orderable: true,
+        },
+      ],
     });
   });
 </script>
