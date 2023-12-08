@@ -4,8 +4,8 @@ var fs = require("fs");
 require("dotenv").config();
 var nodemailer = require("nodemailer");
 module.exports = constant = {
-  appName: "MH Bookshop",
-  appMail: "umarmuhammad408@gmail.com",
+  appName: "Garo Bookshop",
+  appMail: "muhdgazzali01@gmail.com",
   appUrl: "http://localhost:8000",
   appHost: "localhost:8000", //node mailer uses this backend host
   paginate: (totalCount, limit, page) => {

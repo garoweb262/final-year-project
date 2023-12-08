@@ -5,6 +5,8 @@ const User = require("../models/user");
 const Book = require("../models/book");
 const jwt = require("jsonwebtoken");
 const { currentDate } = require("../config/constants");
+
+
 //handle errors
 const handleErrors = (err) => {
   console.log(err.message, err.code);
@@ -43,12 +45,37 @@ const createToken = (id) => {
     expiresIn: maxAge,
   });
 };
-module.exports.get_admin_dashboard = (req, res) => {
-  res.render("../views/pages/admin/dashboard", {
-    title: "Dashboard Admin",
-    layout: "./layouts/admin-dash",
-  });
+module.exports.get_admin_dashboard = async (req, res) => {
+  try {
+    // Retrieve all users from the User model
+    const users = await User.find().exec();
+    const purchases = await Purchase.find().exec();
+    const books = await Book.find().exec();
+    const rents = await Rental.find().exec();
+
+    // Calculate the count of users
+    const userCount = users.length;
+    const purchaseCount = purchases.length;
+    const bookCount = books.length;
+    const rentCount = rents.length;
+
+    // Render the admin dashboard page with user count data
+    res.render("../views/pages/admin/dashboard", {
+      title: "Dashboard Admin",
+      layout: "./layouts/admin-dash",
+      data: {
+        userCount: userCount,
+        bookCount: bookCount,
+        purchaseCount: purchaseCount, 
+        rentCount: rentCount 
+      }
+    });
+  } catch (error) {
+    console.error('Error in get_admin_dashboard:', error);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
 };
+
 module.exports.get_admin_login = (req, res) => {
   res.render("../views/pages/admin/login", {
     title: "Admin Login",
@@ -113,4 +140,31 @@ module.exports.get_all_rent = async (req, res) => {
 
     result: result,
   });
+};
+module.exports.get_all_payments = async (req, res) => {
+  try {
+    const purchaseResult = await Purchase.find({}).populate("bookId userId");
+    const rentalResult = await Rental.find({}).populate("bookId userId");
+
+    // Merge the results from Purchase and Rental into a single array
+    const combinedResults = [
+      ...purchaseResult.map((purchase) => ({
+        ...purchase.toObject(),
+        serviceType: 'Purchase', // Add a 'serviceType' field to identify as Purchase
+      })),
+      ...rentalResult.map((rental) => ({
+        ...rental.toObject(),
+        serviceType: 'Rental', // Add a 'serviceType' field to identify as Rental
+      })),
+    ];
+
+    res.render("../views/pages/admin/all-payment", {
+      title: "All Payments",
+      layout: "./layouts/admin-dash",
+      result: combinedResults, // Pass the combined results to the view
+    });
+  } catch (error) {
+    console.error('Error in get_all_payments:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
 };

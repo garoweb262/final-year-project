@@ -6,6 +6,7 @@ router.post("/login", adminController.login_admin);
 router.get("/dashboard", adminController.get_admin_dashboard);
 router.get("/all-purchase", adminController.get_all_purchase);
 router.get("/all-rents", adminController.get_all_rent);
+router.get("/payments", adminController.get_all_payments);
 
 
 router.get("/", adminController.get_admin_login);

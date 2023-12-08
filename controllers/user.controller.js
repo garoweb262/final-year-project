@@ -63,7 +63,7 @@ module.exports.get_product = async (req, res) => {
             res.json({ message: err.message });
           } else {
             res.render("../views/pages/guest/index", {
-              title: "MH Bookshop",
+              title: "Garo Bookshop",
               result: bookResult,
               data,
             });
@@ -610,7 +610,7 @@ module.exports.search_book = (req, res) => {
         res.status(404).send({ success: true, message: "Book not found " });
       else
         res.render("../views/pages/guest/search-book", {
-          title: "MH Bookshop",
+          title: "Garo Bookshop",
           layout: "./layouts/admin",
           result: result,
         });
