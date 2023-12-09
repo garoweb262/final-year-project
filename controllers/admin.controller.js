@@ -45,6 +45,7 @@ const createToken = (id) => {
     expiresIn: maxAge,
   });
 };
+
 module.exports.get_admin_dashboard = async (req, res) => {
   try {
     // Retrieve all users from the User model
@@ -52,12 +53,47 @@ module.exports.get_admin_dashboard = async (req, res) => {
     const purchases = await Purchase.find().exec();
     const books = await Book.find().exec();
     const rents = await Rental.find().exec();
+    const purchaseResult = await Purchase.find({}).populate("bookId userId");
+    const rentalResult = await Rental.find({}).populate("bookId userId");
 
+    // Merge the results from Purchase and Rental into a single array
+    const combinedResults = [
+      ...purchaseResult.map((purchase) => ({
+        ...purchase.toObject(),   
+      })),
+      ...rentalResult.map((rental) => ({
+        ...rental.toObject(),
+      })),
+    ];
     // Calculate the count of users
     const userCount = users.length;
     const purchaseCount = purchases.length;
     const bookCount = books.length;
     const rentCount = rents.length;
+// Calculate total payment count
+const totalPaymentCount = purchaseCount + rentCount;
+
+// Fetch prices from models
+const totalPurchasePrice = await Purchase.aggregate([
+  {
+    $group: {
+      _id: null,
+      totalPrice: { $sum: { $toInt: "$price" } } // Assuming price field is stored as string, convert to integer for sum
+    }
+  }
+]);
+
+const totalRentalPrice = await Rental.aggregate([
+  {
+    $group: {
+      _id: null,
+      totalPrice: { $sum: { $toInt: "$price" } } // Assuming price field is stored as string, convert to integer for sum
+    }
+  }
+]);
+
+// Calculate total payment amount
+const paymentAmount = (totalPurchasePrice[0]?.totalPrice || 0) + (totalRentalPrice[0]?.totalPrice || 0);
 
     // Render the admin dashboard page with user count data
     res.render("../views/pages/admin/dashboard", {
@@ -67,7 +103,11 @@ module.exports.get_admin_dashboard = async (req, res) => {
         userCount: userCount,
         bookCount: bookCount,
         purchaseCount: purchaseCount, 
-        rentCount: rentCount 
+        rentCount: rentCount ,
+        paymentCount: totalPaymentCount,
+        paymentAmount: paymentAmount,
+        totalPurchase: totalPurchasePrice[0]?.totalPrice || 0,
+        totalRental: totalRentalPrice[0]?.totalPrice || 0
       }
     });
   } catch (error) {
