@@ -4,6 +4,7 @@ const { requireAuth, checkUser } = require("../middlewares/verify");
 
 const router = Router();
 
+
 router.get("*", checkUser);
 router.get("/", userController.get_product);
 router.get("/about", userController.get_about);

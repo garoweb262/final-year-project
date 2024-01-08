@@ -18,7 +18,7 @@ module.exports.get_all_book = (req, res) => {
     if (err) {
       res.json({ message: err.message });
     } else {
-      let id = req.params.id;
+      
       Book.findOne({ bookResult }).exec((err, result) => {
         res.render("../views/pages/admin/all-books", {
           title: "All Books",
@@ -275,7 +275,7 @@ module.exports.get_user_rent = async (req, res) => {
   }
 };
 module.exports.get_user_rent_history = async (req, res) => {
-  Rental.deleteMany();
+  // Rental.deleteMany();
   const token = req.cookies.user;
   if (token) {
     const decodedToken = jwt.verify(token, process.env.USER_SECRET);
