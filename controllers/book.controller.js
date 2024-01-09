@@ -18,14 +18,14 @@ module.exports.get_all_book = (req, res) => {
     if (err) {
       res.json({ message: err.message });
     } else {
-      
+      // res.json({success:true, result:bookResult})
       Book.findOne({ bookResult }).exec((err, result) => {
         res.render("../views/pages/admin/all-books", {
           title: "All Books",
           layout: "./layouts/admin-dash",
           result: bookResult,
         });
-      });
+     });
     }
   });
 };

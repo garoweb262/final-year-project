@@ -39,6 +39,7 @@ router.post("/create", upload.single("dp"), async (req, res) => {
     }
   });
 });
+
 router.post(
   "/upload/:id",
   uploadProfile.single("pdf"),
@@ -61,6 +62,7 @@ router.get("/all-books", bookController.get_all_book);
 router.get("/my-books", checkUser, bookController.get_user_book);
 router.get("/my-rent", checkUser, bookController.get_user_rent);
 router.get("/my-rent-history", checkUser, bookController.get_user_rent_history);
+
 
 router.get("/single/:id", requireAuth, bookController.get_pro_book);
 router.get("/edit/:id", bookController.get_edit_book);

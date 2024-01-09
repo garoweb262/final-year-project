@@ -53,9 +53,8 @@ const config = require("./config/database");
 //offline database
 
 // const connection = mongoose.connect(config.database, {
-//   useUnifiedTopology: true
+//   useUnifiedTopology: true,
 // });
-
 // if (connection) {
 //   console.log("database connected offline");
 // } else {
